@@ -1,0 +1,14 @@
+## NAS Directories
+@eaDir
+
+## Docker Data Directories
+**/data/*
+
+## Docker Env files
+**/.env
+
+## Project Specific
+**/peertube/config/production.yaml
+
+## Other(s)
+**/.DS_Store
