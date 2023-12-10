@@ -1,0 +1,27 @@
+api:
+  dashboard: true
+  #insecure: true
+
+defaultEntryPoints:
+  - http
+
+entryPoints:
+  http:
+    address: ":80"
+    forwardedHeaders:
+      insecure: true
+
+log:
+  level: DEBUG
+
+metrics:
+  prometheus:
+    buckets: 0.1,0.3,1.2,5.0
+
+ping:
+  entryPoint: http
+
+providers:
+  docker:
+    exposedByDefault: false
+    network: public_web

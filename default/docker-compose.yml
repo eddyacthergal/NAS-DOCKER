@@ -1,0 +1,60 @@
+## Traefik Reverse Proxy
+version: '3.9'
+
+networks:
+  ## Public network
+  public_web:
+    name: public_web
+    external: false
+
+services:
+
+  ## Traefik: Container Reverse Proxy
+  traefik:
+    image: traefik:latest
+    deploy:
+      restart_policy:
+        condition: always
+    environment:
+      - TZ=Europe/Paris
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.tls=false
+      ## URLs
+      - traefik.http.routers.traefik.rule=HostRegexp(`{domain:[[:ascii:]]+}`) && (PathPrefix(`/dashboard/`) || HeadersRegexp(`Referer`, `.*/dashboard/.*`))
+      ## Redirect to service
+      - traefik.http.routers.traefik.service=api@internal
+      # UI port
+      - traefik.http.services.traefik.loadbalancer.server.port=8080
+      ## Network
+      - traefik.docker.network=public_web
+    networks:
+      - public_web
+    ports:
+      - 3001:80
+    volumes:
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  ## Whoami: Test service
+  whoami:
+    image: traefik/whoami:latest
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+    environment:
+      - TZ=Europe/Paris
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.whoami.tls=false
+      ## URLs
+      - traefik.http.routers.whoami.rule=HostRegexp(`{domain:[[:ascii:]]+}`) && (PathPrefix(`/whoami/`) || HeadersRegexp(`Referer`, `.*/whoami/.*`))
+      ## Sticky sessions
+      - traefik.http.services.whoami.loadbalancer.sticky.cookie=true
+      # UI port
+      - traefik.http.services.whoami.loadbalancer.server.port=80
+      ## Network
+      - traefik.docker.network=public_web
+    networks:
+      - public_web

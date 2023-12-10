@@ -1,0 +1,52 @@
+version: '3'
+
+networks:
+  default:
+    external: false
+  public_data:
+    external: true
+  public_web:
+    external: true
+
+services:
+
+  peertube:
+    # If you don't want to use the official image and build one from sources:
+    # build:
+    #   context: .
+    #   dockerfile: ./support/docker/production/Dockerfile.bullseye
+    image: chocobozzz/peertube:${peertube_version}
+    env_file:
+      - .env
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.peertube.tls=false
+      # URLs
+      - traefik.http.routers.peertube.rule=HostRegexp(`peertube.{domain:[[:ascii:]]+}`)
+      - traefik.http.routers.peertube.service=peertube
+      ## UI Ports
+      - traefik.http.services.peertube.loadbalancer.server.port=9000
+      ## Routing
+      - traefik.docker.network=public_web
+    networks:
+      - public_web
+      - public_data
+      - default
+    volumes:
+      - assets:/app/client/dist
+      - ./data/peertube:/data
+      - ./config:/config:rw
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:6-alpine
+    env_file:
+      - .env
+    networks:
+      - default
+    volumes:
+      - ./data/redis:/data
+
+volumes:
+  assets:

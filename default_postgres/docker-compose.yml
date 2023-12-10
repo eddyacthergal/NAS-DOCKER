@@ -1,0 +1,52 @@
+version: '3'
+
+networks:
+  public_data:
+    name: public_data
+    external: false
+  public_web:
+    external: true
+
+services:
+
+  ## Global Postgres DB
+  postgres:
+    image: postgres:14-alpine
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - TZ=Europe/Paris
+    networks:
+      - public_data
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+
+  ## PG admin: UI to manage DB
+  pg_admin:
+    image: dpage/pgadmin4:latest
+    env_file: .env
+    environment:
+      - TZ=Europe/Paris
+      - SCRIPT_NAME=/pgadmin
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.pgadmin.tls=false
+      ## URLs
+      - traefik.http.routers.pgadmin.rule=HostRegexp(`{domain:[[:ascii:]]+}`) && PathPrefix(`/pgadmin`)
+      ## UI port
+      - traefik.http.services.pgadmin.loadbalancer.server.port=80
+      ## Sticky sessions
+      - traefik.http.services.pgadmin.loadbalancer.sticky.cookie=true
+      ## Network
+      - traefik.docker.network=public_web
+    volumes:
+      - type: bind
+        source: ./data/pgadmin
+        target: /var/lib/pgadmin:rw
+    networks:
+      - public_data
+      - public_web
+    depends_on:
+      - postgres
