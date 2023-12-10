@@ -33,7 +33,7 @@ services:
     ports:
       - 3001:80
     volumes:
-      - ./traefik/traefik.yml:/etc/traefik/traefik.yml
+      - ./config/traefik:/etc/traefik
       - /var/run/docker.sock:/var/run/docker.sock
 
   ## Whoami: Test service

@@ -25,3 +25,6 @@ providers:
   docker:
     exposedByDefault: false
     network: public_web
+  file:
+    directory: /etc/traefik/dynamic.yml
+    watch: true
