@@ -21,7 +21,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.traefik.tls=false
       ## URLs
-      - traefik.http.routers.traefik.rule=HostRegexp(`{domain:[[:ascii:]]+}`) && (PathPrefix(`/dashboard/`) || HeadersRegexp(`Referer`, `.*/dashboard/.*`))
+      - traefik.http.routers.traefik.rule=HostRegexp(`admin.{domain:[[:ascii:]]+}`) && (PathPrefix(`/dashboard/`) || HeadersRegexp(`Referer`, `.*/dashboard/.*`))
       ## Redirect to service
       - traefik.http.routers.traefik.service=api@internal
       # UI port
@@ -49,7 +49,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.whoami.tls=false
       ## URLs
-      - traefik.http.routers.whoami.rule=HostRegexp(`{domain:[[:ascii:]]+}`) && (PathPrefix(`/whoami/`) || HeadersRegexp(`Referer`, `.*/whoami/.*`))
+      - traefik.http.routers.whoami.rule=HostRegexp(`admin.{domain:[[:ascii:]]+}`) && (PathPrefix(`/whoami/`) || HeadersRegexp(`Referer`, `.*/whoami/.*`))
       ## Sticky sessions
       - traefik.http.services.whoami.loadbalancer.sticky.cookie=true
       # UI port

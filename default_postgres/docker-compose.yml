@@ -34,7 +34,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.pgadmin.tls=false
       ## URLs
-      - traefik.http.routers.pgadmin.rule=HostRegexp(`{domain:[[:ascii:]]+}`) && PathPrefix(`/pgadmin`)
+      - traefik.http.routers.pgadmin.rule=HostRegexp(`admin.{domain:[[:ascii:]]+}`) && PathPrefix(`/pgadmin`)
       ## UI port
       - traefik.http.services.pgadmin.loadbalancer.server.port=80
       ## Sticky sessions
